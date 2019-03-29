@@ -26,6 +26,8 @@ Python 速查表中文版
 
 [对列表、字典和元组的深入理解](#对列表和字典以及元组的深入理解)
 
+[单元测试](#单元测试)
+
 ## 惯例
 
 - Python 对大小写敏感；
@@ -92,7 +94,7 @@ Python 速查表中文版
    if variable is None :
    ```
 
-6. **datatime**：Python 内建的 datetime 模块提供了 `datetime`、`data` 以及 `time` 类型。
+6. **datetime**：Python 内建的 datetime 模块提供了 `datetime`、`data` 以及 `time` 类型。
 
    - `datetime` 组合了存储于 `date` 和 `time` 中的信息。
 
@@ -112,7 +114,7 @@ dt2 = dt1.replace(minute = 0, second = 30)
 diff = dt1 - dt2
 ```
 
-**注：Python 中的绝大多数对象都是可变的，只有字符串和元组例外。**
+** 注：Python中的不可变对象只有`numbers`,`str`,`tuple`。 可变（Mutable）与不可变（Immutable）关键在于对象初始化之后内存`id`会不会改变**
 
 ## 数据结构
 
@@ -347,8 +349,7 @@ sorted([2, 1, 3]) => [1, 2, 3]
 应用：
 
 ```python
-sorted(set('abc bcd')) => [' ',
-'a', 'b', 'c', 'd']
+sorted(set('abc bcd')) => [' ', 'a', 'b', 'c', 'd']
 # 返回一个字符串排序后无重复的字母序列
 ```
 
@@ -369,7 +370,7 @@ for i, (a, b) in enumerate(zip(seq1, seq2)):
 2. `unzip`：另一种思考方式是把一些行转化为一些列：
 
 ```python
-seq1, seq2 = zip(zipOutput)
+seq1, seq2 = unzip(zipOutput)
 ```
 
 - `reversed()` 将一个序列的元素以逆序迭代。
@@ -541,5 +542,57 @@ for val in collection:
 
 ```python
 [expr for val in collection for innerVal in val if condition]
+```
+
+## 单元测试
+
+Python自带`unittest`模块，可供我们编写单元测试。
+
+```python
+import unittest
+```
+
+我们可以编写继承于`unittest.TestCase`测试类的子类，并在子类中编写具体的测试函数。测试函数命必须以`test_`开头，否则不会被识别为测试函数，进而不会在运行单元测试时被运行。 
+
+```python
+class TestSubclass(unittest.TestCase):
+  def test_func(self):
+    self.assertEqual(0, 0)
+    # 可以通过msg关键字参数提供测试失败时的提示消息
+    self.assertEqual(0, 0, msg='modified message')
+    self.assertGreater(1, 0)
+    self.assertIn(0, [0])
+    self.assertTrue(True)
+    # 测试是否会抛出异常
+    with self.assertRaises(KeyError):
+      _ = dict()[1]
+
+  # 被@unittest.skip装饰器装饰的测试类或测试函数会被跳过
+  @unittest.skip(reason='just skip')
+  def test_skip(self):
+    raise Exception('I shall never be tested')
+```
+
+另外， `unittest.TestCase`中还有两个特殊的成员函数，他们分别会在调用每一个测试函数的前后运行。在测试前连接数据库并在测试完成后断开连接是一种常见的使用场景。
+
+```python
+def setUp(self):
+  # To do: connect to the database
+  pass
+
+def tearDown(self):
+  # To do: release the connection
+  pass
+
+def test_database(self):
+  # To do: test the database
+  pass
+```
+
+测试类编写完毕后，可以通过添加以下代码来将当前文件当成正常的Python脚本使用
+
+```python
+if __name__ == '__main__':
+  unittest.main()
 ```
 
